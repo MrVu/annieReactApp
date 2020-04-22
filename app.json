@@ -1,0 +1,17 @@
+{
+  "name": "annieAdmin",
+  "displayName": "annieAdmin",
+  "expo": {
+    "name": "annieAdmin",
+    "slug": "annieAdmin",
+    "version": "1.0.0",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
