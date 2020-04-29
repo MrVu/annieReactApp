@@ -2,16 +2,25 @@
   "name": "annieAdmin",
   "displayName": "annieAdmin",
   "expo": {
-    "name": "annieAdmin",
-    "slug": "annieAdmin",
-    "version": "1.0.0",
-    "platforms": [
-      "ios",
-      "android",
-      "web"
-    ],
-    "assetBundlePatterns": [
-      "**/*"
-    ]
+      "name": "annieAdmin",
+      "icon": "./assets/icon.png",
+      "slug": "annieAdmin",
+      "version": "1.0.0",
+      "platforms": [
+        "ios",
+        "android",
+        "web"
+      ],
+
+      "android": {
+        "package": "com.anniecosmetic.annieadmin",
+        "versionCode": 1
+      },
+
+      "splash": {
+        "image": "./assets/annie-splash-screen.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#fff"
+      },
   }
 }
