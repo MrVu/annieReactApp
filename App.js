@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList , AsyncStorage} from 'react-native';
-import { createStackNavigator } from 'react-navigation-stack';
+import { createStackNavigator, TransitionPresets } from 'react-navigation-stack';
 import {createAppContainer,NavigationActions, StackActions,StackNavigator} from 'react-navigation';
 import {createBottomTabNavigator} from 'react-navigation-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -9,19 +9,34 @@ import OrderDetail from './components/order_detail.js'
 import LoginView from './components/login.js'
 import initPage from './components/init.js'
 import deliveryPage from './components/delivery.js'
+import profilePage from './components/profile.js'
 
+const ProfileStack = createStackNavigator(
+  {
+    Profile: {screen: profilePage}
+  },
+  {
+    defaultNavigationOptions: TransitionPresets.SlideFromRightIOS,
+  }
+)
 const DeliveryStack = createStackNavigator(
   {
     Delivery: {screen: deliveryPage}
+  },
+  {
+    defaultNavigationOptions: TransitionPresets.SlideFromRightIOS,
   }
 )
 const RootStack = createStackNavigator(
 {
-  Init : {screen: initPage},
+
   Orders: { screen: OrderList  },
   Detail: { screen: OrderDetail },
   Login: {screen : LoginView},
 },
+{
+  defaultNavigationOptions: TransitionPresets.SlideFromRightIOS,
+}
 
 );
 RootStack.navigationOptions = ({ navigation }) => {
@@ -43,6 +58,7 @@ const App = createBottomTabNavigator(
   {
     Home: { screen: RootStack },
     Docs: { screen: DeliveryStack },
+    Pros: { screen: ProfileStack},
   },
   {
     defaultNavigationOptions: ({ navigation }) => ({
@@ -53,7 +69,10 @@ const App = createBottomTabNavigator(
         if (routeName === 'Home') {
           iconName = 'ios-cart'
         } else if (routeName === 'Docs') {
-          iconName = 'ios-basket';
+          iconName = 'ios-car';
+        }
+        else if (routeName === 'Pros') {
+          iconName = 'ios-settings';
         }
         return <IconComponent name={iconName} size={25} color={tintColor} />;
       },

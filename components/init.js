@@ -13,7 +13,9 @@ export class initPage extends Component {
   componentDidMount() {
     this.onLoad();
   }
+  componentWillUnmount(){
 
+  }
   //Navigation headers
     static navigationOptions = {
         title: null,
@@ -38,7 +40,7 @@ export class initPage extends Component {
   render(){
     return(
       <View style={styles.container}>
-        <ActivityIndicator />
+        <ActivityIndicator size="large"/>
         <StatusBar barStyle="default" />
       </View>
     );

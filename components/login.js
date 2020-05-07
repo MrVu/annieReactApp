@@ -62,12 +62,22 @@ export class LoginView extends Component {
     }
   }
   //-----------------------
-
-  success_request = (token) => {
-    this.storeToken(token);
-    this.props.navigation.replace('Orders', { 'token': token });
+  //AsyncStorage save
+  async storeId(userId) {
+    try {
+       await AsyncStorage.setItem("userId", JSON.stringify(userId));
+    } catch (error) {
+      console.log("Something went wrong", error);
+    }
   }
-
+  //-----------------------
+  //redirect to other page
+  success_request = (token, userId) => {
+    this.storeToken(token);
+    this.storeId(userId);
+    this.props.navigation.replace('Orders', { 'token': token, 'userId': userId });
+  }
+  //----------------------
   send_request = (email, password) => {
     var formData = new FormData();
     formData.append('username', email);
@@ -75,7 +85,7 @@ export class LoginView extends Component {
     fetch('https://anniecosmetic.vn/api/login', {method: 'POST', body : formData})
       .then((response) => response.json())
       .then((json) => {
-        json.token ? this.success_request(json.token) : Alert.alert('Error', json.error);
+        json.token ? this.success_request(json.token, json.userId) : Alert.alert('Error', json.error);
       })
       .catch((error) => console.error(error))
       .finally(() => {

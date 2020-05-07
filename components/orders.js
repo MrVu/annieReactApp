@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList , AsyncStorage, BackHandler, Alert, Vibration, ToastAndroid} from 'react-native';
+import { StyleSheet, Text, ActivityIndicator, View, Image, TouchableOpacity, FlatList , AsyncStorage, BackHandler, Alert, Vibration, ToastAndroid, SafeAreaView,StatusBar} from 'react-native';
 import {createBottomTabNavigator} from 'react-navigation';
 export class OrderList extends Component {
-  //Khai báo biến
+//Khai báo biến
   constructor(props) {
     super(props);
     this.state = {
@@ -14,6 +14,7 @@ export class OrderList extends Component {
     //AsyncStorage.removeItem('userToken')
     this.getToken();
   }
+//------------------
 // check back button state
   _resetCount = () => {
     this.setState({clickcount:0});
@@ -38,10 +39,10 @@ export class OrderList extends Component {
   }
 //-----------------
 //logo click
-logoListener = () => {
-  Vibration.vibrate(150);
-  this.getToken();
-}
+  logoListener = () => {
+    Vibration.vibrate(150);
+    this.getToken();
+  }
 //----------
 //Navigation headers
   static navigationOptions = {
@@ -50,18 +51,19 @@ logoListener = () => {
       headerShown: false,
   };
 //------------------
-
+//Lấy giá trị lưu trữ
   async getToken() {
     try {
       let userToken = await AsyncStorage.getItem("userToken");
       let token = JSON.parse(userToken);
+      //make request from token
       this.makeRequest(token);
       this.setState({token: token});
     } catch (error) {
       console.log("Something went wrong", error);
     }
   }
-
+//-----------------
   makeRequest = (token) =>{
     fetch('https://anniecosmetic.vn/api/orders', { method: 'GET' , headers: {'Authorization': 'Token ' + token}})
       .then((response) => response.json())
@@ -73,12 +75,18 @@ logoListener = () => {
         this.setState({ isLoading: false });
       });
   }
+  //to listen on forcus
+  onLoad = () => {
+  this.props.navigation.addListener('didFocus', () => this.getToken())
+  }
+  //end onload
 
   componentDidMount() {
     this.backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
       this.backAction
     );
+    this.onLoad();
   }
 
   componentWillUnmount() {
@@ -86,9 +94,13 @@ logoListener = () => {
     this.backHandler.remove();
   }
   render() {
-    return (
+    return this.state.isLoading == true ? (<View style={styles.loading}><ActivityIndicator  size="large"/></View>) : (
 
       <View style= { styles.container }>
+        <StatusBar
+         backgroundColor="black"
+         barStyle="light-content"
+        />
         <View style= {styles.brand}>
         <TouchableOpacity onPress={() => this.logoListener()}>
           <Text style={styles.brand_text}>ANNIECOSMETIC</Text>
@@ -132,7 +144,7 @@ const styles = StyleSheet.create({
   container: {flex: 1,marginTop:40},
   brand:{alignItems:'center', marginBottom:10},
   brand_text:{color: '#f48b8c', fontSize: 30, fontWeight: 'bold'},
-  header : {backgroundColor: '#f48b8c', height:40, justifyContent:'center'},
+  header : {backgroundColor: '#f48b8c', height:30, justifyContent:'center'},
   headerText :{color: '#fff', textAlign: 'center', fontWeight: 'bold',fontSize: 15},
   order_wrap: {marginBottom: 10,borderBottomWidth:1,borderBottomColor:'#bbb',height: 60,},
   customer:{textTransform: 'uppercase',color:'#bbb',fontWeight:'bold'},
@@ -142,5 +154,6 @@ const styles = StyleSheet.create({
   not_confirm:{textTransform: 'uppercase',color: '#fff', backgroundColor: '#f48b8c', width:120, textAlign:'center', fontWeight:'bold', marginRight: '5%'},
   code:{flexDirection: 'row', height: 25, justifyContent:'center'},
   cost:{marginLeft:'auto'},
+  loading:{flex: 1, alignItems: 'center',justifyContent:'center'},
 });
 export default OrderList
