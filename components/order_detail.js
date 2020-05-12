@@ -33,11 +33,13 @@ export class OrderDetail extends Component {
   //--------
 
   //Update => Patch method
-  updateStatus = (confirm, paid) => {
+  updateStatus = (confirm, delivery, paid, cancel) => {
     Vibration.vibrate(70);
     var formData = new FormData();
-    formData.append('confirm', confirm)
+    formData.append('confirm', confirm);
     formData.append('paid', paid);
+    formData.append('delivery', delivery);
+    formData.append('cancel', cancel);
     fetch('https://anniecosmetic.vn/api/orders/' + this.state.itemID + '/', { method: 'PATCH' , headers: {'Authorization': 'Token ' + this.state.token}, body : formData})
       .then((response) => response.json())
       .then((json) => {
@@ -87,19 +89,29 @@ export class OrderDetail extends Component {
                   <Text style={styles.modalInHeadText}>CẬP NHẬT ĐƠN HÀNG</Text>
                 </View>
                 <View style={styles.modalContent}>
-                  <TouchableOpacity onPress= {() => this.updateStatus(false, false)}>
-                    <View style={styles.modalContentTx}>
-                      <Text style={{fontWeight:'bold', color: '#f48b8c'}}>CHƯA XÁC NHẬN</Text>
+                  <TouchableOpacity onPress= {() => this.updateStatus(false, false, false, false)}>
+                    <View style={styles.modalContentTxW}>
+                      <Text style={styles.modalContentTx}>CHƯA XÁC NHẬN</Text>
                     </View>
                   </TouchableOpacity>
-                  <TouchableOpacity onPress= {() => this.updateStatus(true, false)}>
-                    <View style={styles.modalContentTx}>
-                      <Text style={{fontWeight:'bold', color: '#f48b8c'}}>ĐÃ XÁC NHẬN</Text>
+                  <TouchableOpacity onPress= {() => this.updateStatus(true, false, false, false)}>
+                    <View style={styles.modalContentTxW}>
+                      <Text style={styles.modalContentTx}>ĐÃ XÁC NHẬN</Text>
                     </View>
                   </TouchableOpacity>
-                  <TouchableOpacity onPress= {() => this.updateStatus(true, true)}>
-                    <View style={styles.modalContentTx}>
-                      <Text style={{fontWeight:'bold', color: '#f48b8c'}}>ĐÃ HOÀN THÀNH</Text>
+                  <TouchableOpacity onPress= {() => this.updateStatus(true, true, false, false)}>
+                    <View style={styles.modalContentTxW}>
+                      <Text style={styles.modalContentTx}>ĐANG GIAO HÀNG</Text>
+                    </View>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress= {() => this.updateStatus(true, true, true, false)}>
+                    <View style={styles.modalContentTxW}>
+                      <Text style={styles.modalContentTx}>ĐÃ HOÀN THÀNH</Text>
+                    </View>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress= {() => this.updateStatus(false, false, false, true)}>
+                    <View style={styles.modalContentTxW}>
+                      <Text style={styles.modalContentTx}>HỦY ĐƠN HÀNG</Text>
                     </View>
                   </TouchableOpacity>
                 </View>
@@ -123,26 +135,26 @@ export class OrderDetail extends Component {
           <Text style={styles.infoHeaderText}>THÔNG TIN KHÁCH HÀNG:</Text>
           </View>
           <View style={styles.orderInfo}>
-            <View style={{flexDirection: 'row', height:20}}>
+            <View style={{flexDirection: 'row'}}>
               <Text style={styles.boldAndUpper}>Tên khách hàng:</Text>
-              <Text> {this.state.data.name}</Text>
+              <Text>{data.name}</Text>
             </View>
-            <View style={{flexDirection: 'row',height:20}}>
+            <View style={{flexDirection: 'row'}}>
               <Text style={styles.boldAndUpper}>Địa chỉ:</Text>
-              <Text> { this.state.data.address } </Text>
+              <Text style = {{flexWrap: "wrap"}}>{ data.address } </Text>
             </View>
-            <View style={{flexDirection: 'row',height:20}}>
+            <View style={{flexDirection: 'row'}}>
               <Text style={styles.boldAndUpper}>Số điện thoại:</Text>
-              <Text> { this.state.data.phone_number } </Text>
+              <Text>{data.phone_number}</Text>
             </View>
-            <View style={{flexDirection: 'row',height:20}}>
+            <View style={{flexDirection: 'row'}}>
               <Text style={styles.boldAndUpper}>Email:</Text>
-              <Text> { this.state.data.email } </Text>
+              <Text>{data.email}</Text>
             </View>
-            <View style={{flexDirection: 'row',height:20}}>
+            <View style={{flexDirection: 'row'}}>
               <Text style={styles.boldAndUpper}>Tình trạng: </Text>
-              <Text style = {this.state.data.confirm && this.state.data.paid ? styles.paid : this.state.data.confirm && !this.state.data.paid ? styles.confirm : styles.not_confirm}>
-                { this.state.data.confirm && this.state.data.paid ? 'Đã hoàn thành': this.state.data.confirm && !this.state.data.paid ? 'Đã xác nhận' : 'Chưa xác nhận' }
+              <Text style = {!!data.confirm && !!data.paid && !!data.delivery && !data.cancel ? styles.paid : data.confirm && !data.paid && !data.delivery && !data.cancel ? styles.confirm : !!data.confirm && !!data.delivery && !data.paid && !data.cancel ? styles.confirm : !!data.cancel ? styles.cancel : styles.not_confirm}>
+                { !!data.confirm && !!data.paid && !!data.delivery && !data.cancel ? 'Đã hoàn thành': !!data.confirm && !data.paid && !data.delivery ? 'Đã xác nhận': !!data.confirm && !!data.delivery && !data.paid ? 'Đang giao hàng' : !!data.cancel ? 'Đã hủy' : 'Chưa xác nhận' }
               </Text>
 
             </View>
@@ -177,13 +189,14 @@ export class OrderDetail extends Component {
 const styles = StyleSheet.create({
   container:{flex: 1},
   modalView:{flex:1, justifyContent: "center",alignItems: "center",backgroundColor: '#00000080'},
-  modalInner:{backgroundColor:'#fff' , height: 200, width: 400},
+  modalInner:{backgroundColor:'#fff' , height: 300, width: 400},
   modalInnerHead:{backgroundColor:'#f48b8c', height:30, alignItems:'center', justifyContent: "center" },
   modalInHeadText:{color: '#fff', fontWeight:'bold', fontSize:15},
   modalClose:{alignItems:'center', marginTop:'auto', marginBottom:10},
   modalCloseText:{color: '#f48b8c',fontWeight:'bold', fontSize:15, width: 100, textAlign:'center' },
-  modalContent : {alignItems:'center',flexDirection:'row', height:100, marginTop: 20, justifyContent:'center'},
-  modalContentTx:{width:120, alignItems:'center', height:40, justifyContent:'center'},
+  modalContent : {alignItems:'center',flexDirection:'column', height:200, marginTop: 20, justifyContent:'center'},
+  modalContentTxW:{ height:40, justifyContent:'center', borderBottomWidth: 1, borderBottomColor:'#bbb'},
+  modalContentTx:{fontWeight:'bold', color: '#f48b8c'},
   info: {marginTop:10,marginLeft: '2.5%', borderBottomWidth:1, borderBottomColor:'#bbb', marginRight:'2.5%'},
   orderInfo :{padding:10,},
   header:{height:40, justifyContent:'center'},
@@ -197,6 +210,7 @@ const styles = StyleSheet.create({
   confirm:{textTransform: 'uppercase',color:'#f48b8c', fontWeight:'bold', textAlign:'center'},
   paid :{textTransform: 'uppercase',color:'#fff', backgroundColor: '#bbb', width:120, textAlign:'center'},
   not_confirm:{textTransform: 'uppercase',color: '#fff', backgroundColor: '#f48b8c', width:120, textAlign:'center', fontWeight:'bold'},
+  cancel:{textTransform: 'uppercase',color:'red', fontWeight:'bold', width: 55, textAlign:'center'},
   boldAndUpper:{textTransform: 'uppercase', color:'gray', fontWeight:'bold', width:150},
   status: {width: 120, alignItems: 'center', marginLeft: 'auto'},
   loading:{flex: 1, alignItems: 'center',justifyContent:'center'},

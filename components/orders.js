@@ -127,8 +127,8 @@ export class OrderList extends Component {
                   <View style = {{ flexDirection: 'row', marginLeft: 20,}}>
                     <Text style={styles.customer}>{ item.name } < /Text>
                     <View style={styles.status}>
-                      <Text style = {item.confirm && item.paid ? styles.paid : item.confirm && !item.paid ? styles.confirm : styles.not_confirm}>
-                       { item.confirm && item.paid ? 'Đã hoàn thành': item.confirm && !item.paid ? 'Đã xác nhận' : 'Chưa xác nhận' }
+                      <Text style = {item.confirm && item.paid && !!item.delivery && !item.cancel ? styles.paid : item.confirm && !item.paid && !item.delivery && !item.cancel ? styles.confirm : !!item.confirm && !!item.delivery && !item.paid && !item.cancel ? styles.confirm : !!item.cancel ? styles.cancel  : styles.not_confirm}>
+                       { item.confirm && item.paid && item.delivery && !item.cancel ? 'Đã hoàn thành': item.confirm && !item.paid && !item.delivery && !item.cancel ? 'Đã xác nhận': !!item.cancel ? 'Đã hủy' : !!item.confirm && !!item.delivery && !item.cancel ? 'Đang giao hàng' : 'Chưa xác nhận' }
                       </Text>
                     </View>
                   </View>
@@ -152,6 +152,7 @@ const styles = StyleSheet.create({
   confirm:{textTransform: 'uppercase',color:'#f48b8c', fontWeight:'bold'},
   paid :{textTransform: 'uppercase',color:'#fff', backgroundColor: '#bbb'},
   not_confirm:{textTransform: 'uppercase',color: '#fff', backgroundColor: '#f48b8c', width:120, textAlign:'center', fontWeight:'bold', marginRight: '5%'},
+  cancel:{textTransform: 'uppercase',color:'red', fontWeight:'bold'},
   code:{flexDirection: 'row', height: 25, justifyContent:'center'},
   cost:{marginLeft:'auto'},
   loading:{flex: 1, alignItems: 'center',justifyContent:'center'},
